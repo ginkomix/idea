@@ -4,6 +4,7 @@ function main(key){
     var string=''; 
     var self = this;
     var array= [];
+    var 
 
 
     function write(leter) {
@@ -93,32 +94,35 @@ function main(key){
         }
     }
 
-    this.encryption = function() {
-        let offset = 0,offsetArr=0;
+    this.encryption = function(b1,b2,b3,b4) {
+        let offset = 0,offsetArr=0,buf[3];
+        buf[0] =b1;
+        buf[1] =b2;
+        buf[2] =b3;
+        buf[3] =b4;
         for(let i = 0;i<8;i++) {
-            let step1=0,step2=0,step3=0,step4=0,step5=0,step6=0,step7=0,step8=0,step9=0,step10=0,step11=0,step12=0,step13=0,step14=0;
-            step1 = (key[i+offset]*array[i+offsetArr])%65537;
-            step2 = (key[i+1+offset]+array[i+1+offsetArr])%65536;
-            step3 = (key[i+2+offset]+array[i+2+offsetArr])%65536;
-            step4 = (key[i+3+offset]*array[i+3+offsetArr])%65537;
-            step5 =  step1^ step3;
-            step6 =  step2^ step4;
-            step7 = (step5*key[i+4+offset])%65537;
+            let step1=0,step2=0,step3=0,step4=0,step5=0,step6=0,step7=0,step8=0,step9=0,step10=0;
+            step1 = (arrayKey[i+offset]*buf[0])%65537;
+            step2 = (arrayKey[i+1+offset]+buf[1])%65536;
+            step3 = (arrayKey[i+2+offset]+buf[2])%65536;
+            step4 = (arrayKey[i+3+offset]*buf[3])%65537;
+            step5 = step1^ step3;
+            step6 = step2^ step4;
+            step7 = (step5*arrayKey[i+4+offset])%65537;
             step8 = (step6 + step7) % 65536;
-            step9 = (step8*key[i+5+offset])%65537;
+            step9 = (step8*arrayKey[i+5+offset])%65537;
             step10 = (step7 + step9) % 65536;
-            step11 = step3^step9;
-            step12 = step1^step9;
-            step13 = step2^step10;
-            step14 =  step4^step10;
-
-
-
-
-
+            buf[0] = step3^step9;
+            buf[1] = step1^step9;
+            buf[2] = step2^step10;
+            buf[3] =  step4^step10;
             offset+=6;
-            offsetArr+=4;
         }
+             buf[0] = (arrayKey[i+offset]*buf[0])%65537;
+            buf[1] = (arrayKey[i+1+offset]+buf[1])%65536;
+            buf[2] = (arrayKey[i+2+offset]+buf[2])%65536;
+            buf[3] = (arrayKey[i+3+offset]*buf[3])%65537;
+ return buf;
     }
 
 }
