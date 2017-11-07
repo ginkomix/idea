@@ -92,7 +92,7 @@ function main(key){
 
         }
     }
- 
+
     this.encryption = function() {
         let offset = 0,offsetArr=0;
         for(let i = 0;i<8;i++) {
@@ -103,12 +103,14 @@ function main(key){
             step4 = (key[i+3+offset]*array[i+3+offsetArr])%65537;
             step5 =  step1^ step3;
             step6 =  step2^ step4;
-            //        (a * b) % 65537
-            //        (a + b) % 65536
-            //        a^b
-            step7= (step5*key[i+4+offset])%65537;
-            step8=  (step6 + step7) % 65536;
-
+            step7 = (step5*key[i+4+offset])%65537;
+            step8 = (step6 + step7) % 65536;
+            step9 = (step8*key[i+5+offset])%65537;
+            step10 = (step7 + step9) % 65536;
+            step11 = step3^step9;
+            step12 = step1^step9;
+            step13 = step2^step10;
+            step14 =  step4^step10;
 
 
 
