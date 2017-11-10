@@ -7,51 +7,33 @@ function main(key){
     var res= [];
 
 
-    function write(leter) {
+    this.write = function(leter,url) {
+        var buf ='';
+        for(let a=0;a<leter.length;a++)
+            buf+=leter[a];
+       
         $.ajax({
             url:"http://idea/write.php", 
             type: "POST",
-            dataType:"HTML",
             data:({
-                leter:leter
-            }),
+                leterPOST:buf,
+                url:url
+            })
+
         });
     }
 
-    //     this.read =function() {
-    //                $.ajax({
-    //                    url:"http://idea/open.php", 
-    //                    type: "GET",
-    //                    dataType:"HTML",
-    //                    success:function(data){
-    //                      let string =data;
-    //             let flag=0,offset=0;
-    //        let size = string.length,stringBuf = string;
-    //        for(;size%8!=0;size++){
-    //            string+=0;
-    //        }
-    //        for(let i=0;i<size;i+=2){
-    //            
-    //            let buf = string[i+1].charCodeAt(0).toString(2);
-    //            for(;buf.length<8;){
-    //                buf='0'+buf;
-    //            }
-    //           
-    //           let buf2=string[i].charCodeAt(0).toString(2);
-    //              for(;buf2.length<8;){
-    //                buf2='0'+buf2;
-    //            }
-    //            buf+=buf2;
-    //            array.push(parseInt(buf,2));
-    //        
-    //        }
-    //            console.log(array);            
-    //                    
-    //                    }
-    //                    
-    //                }); 
-    //
-    //    }
+    this.read =function() {
+        $.ajax({
+            url:"http://idea/open.php", 
+            type: "GET",
+            dataType:"HTML",
+            success:function(data){
+               stringArray(data);
+            }
+        }); 
+
+    }
 
     this.keyFunc =function() {
         arrayKey=[];
@@ -98,7 +80,7 @@ function main(key){
 
 
     }
-    this.stringArray = function(string) {
+    function stringArray(string) {
         let flag=0,offset=0;
         let size = string.length,stringBuf = string;
         for(;size%8!=0;size++){
@@ -121,7 +103,7 @@ function main(key){
             array.push(parseInt(buf,2));
 
         }
-
+        console.log(array);
     }
     function add(val,val1){
         return (val+val1)%65536;
@@ -144,7 +126,7 @@ function main(key){
         } 
         let res = 1; 
         while ((res * num) % 65537 != 1) {
-               
+
             res++; } 
         return res;
     }
@@ -167,20 +149,17 @@ function main(key){
             arrKay[a+4] =(adit(arrayKey[i+1]));
             arrKay[a+3] =(adit(arrayKey[i+2])); 
             arrKay[a+5]=(mult(arrayKey[i+3]));
-             i-=2;
-     
+            i-=2;
+
         }
         var buf =  arrKay[a+4];
         arrKay[a+4] = arrKay[a+3];
         arrKay[a+3] = buf;
-      
-       for(let i=0;i<52;i++)
-           arrayKey[i]=arrKay[i];
-      
+
+        for(let i=0;i<52;i++)
+            arrayKey[i]=arrKay[i];
+
     }
-
-
-
     this.encryption = function(b1,b2,b3,b4) {
         let offsetArr=0,buf=[4];
 
@@ -191,7 +170,7 @@ function main(key){
 
         for(let i = 0;i<8;i++) {
             let step1=0,step2=0,step3=0,step4=0,step5=0,step6=0,step7=0,step8=0,step9=0,step10=0;
-          
+
             step1 = mul(arrayKey[i*6],buf[0]);
             step2 = add(arrayKey[i*6+1],buf[1]);
             step3 = add(arrayKey[i*6+2],buf[2]);
@@ -206,22 +185,23 @@ function main(key){
             buf[2] = step2^step10;
             buf[1] = step3^step9;
             buf[3] =  step4^step10;
-            
 
-            
+
+
         }
-console.log(arrayKey[49]);
+
         var bufr = buf[1];
         buf[1]=buf[2];
         buf[2]=bufr;
-        console.log(add(arrayKey[49],buf[1]));
+
         buf[0] = mul(arrayKey[48],buf[0]);
         buf[1] = add(arrayKey[49],buf[1]);
         buf[2] = add(arrayKey[50],buf[2]);
         buf[3] = mul(arrayKey[51],buf[3]);
-console.log(buf);
-return buf;
-       
+
+
+        return buf;
+
 
     }
 
@@ -230,70 +210,36 @@ return buf;
 $('#q').on('click',function(){
     //    var key = $('#key').val();
     var mainА = new main('12341234123412341234123412341234');
-
+    var arr1 = [],arr2 =[];
     mainА.keyFunc();
 
-    mainА.stringArray('qweqweqw');
+  
 
     var arr = mainА.getArrayKey(),decryptio = [];
-
-    for(let i =0;i<arr.length/4;i+=4)
-  decryptio=mainА.encryption(arr[i],arr[i+1],arr[i+2],arr[i+3]);
-      
-    mainА.decryption();
-    for(let i =0;i<decryptio.length/4;i+=4)
-mainА.encryption(decryptio[i],decryptio[i+1],decryptio[i+2],decryptio[i+3]);
+    mainА.read();
+    setTimeout(function(){
+       for(let i =0;i<arr.length/4;i+=4){
+            var buf =[];  
+            buf=mainА.encryption(arr[i],arr[i+1],arr[i+2],arr[i+3]);
+            for(let i=0;i<4;i++)
+                arr1.push(buf[i]);
+        }
+    
+        mainА.write(arr1,'wrire.txt');
+        mainА.decryption();
+        for(let i =0;i<arr1.length/4;i+=4){
+            var buf =[];
+    
+            buf=mainА.encryption(decryptio[i],decryptio[i+1],decryptio[i+2],arr1[i+3]);
+            for(let i=0;i<4;i++)
+                arr2.push(buf[i]);
+        }
+         mainА.write(arr2,'wrire1.txt'); 
+    },100);
+        
 });
 
 
-
-
-//function parseStrToBuffer (string) {
-//    var result = [],
-//        index = 0,
-//        length = string.length,
-//        code;
-//
-//    for (; index < length; index++) {
-//        code = string.charCodeAt(index);
-//        if (code <= 0x7f) {
-//            result.push(code);
-//        } else if (code <= 0x7ff) {
-//            result.push(code >>> 6 | 0xc0,
-//                        code & 0x3f | 0x80);
-//        } else if (code <= 0xffff) {
-//            result.push(code >>> 12 | 0xe0,
-//                        code >>> 6 & 0x3f | 0x80,
-//                        code & 0x3f | 0x80);
-//        } else if (code <= 0x1fffff) {
-//            result.push(code >>> 18 | 0xf0,
-//                        code >>> 12 & 0x3f | 0x80,
-//                        code >>> 6 & 0x3f | 0x80,
-//                        code & 0x3f | 0x80);
-//        } else if (code <= 0x3ffffff) {
-//            result.push(code >>> 24 | 0xf8,
-//                        code >>> 18 & 0x3f | 0x80,
-//                        code >>> 12 & 0x3f | 0x80,
-//                        code >>> 6 & 0x3f | 0x80,
-//                        code & 0x3f | 0x80);
-//        } else if (code <= 0x7fffffff) {
-//            result.push(code >>> 30 | 0xfc,
-//                        code >>> 24 & 0x3f | 0x80,
-//                        code >>> 18 & 0x3f | 0x80,
-//                        code >>> 12 & 0x3f | 0x80,
-//                        code >>> 6 & 0x3f | 0x80,
-//                        code & 0x3f | 0x80);
-//        }
-//    }
-//
-//    return result;
-//}
-
-// Test string: ﻰﺠ﷼ﺒ╤Ή
-// Result: [ 239, 187, 176, 239, 186, 160, 239, 183, 188, 239, 186, 146, 226, 149, 164, 206, 137 ]
-//alert(JSON.stringify(parseStrToBuffer(prompt('Enter string'))));
-
-////123456789012345678901234567890ab
 
 
 

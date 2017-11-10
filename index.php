@@ -8,9 +8,9 @@
     </head>
     <body>
     <div class="cezar">
-    <p>Ваш текст:</p>
+    <p>Путь к файлу:</p>
         <textarea type="text"  id="massage" ></textarea>
-     <p>Расшифрованный текст:</p>
+     <p>Ключь:</p>
      <p><textarea type="text"  id="key" ></textarea></p>
      <button id="q">+</button>
      <p id="output"></p>
